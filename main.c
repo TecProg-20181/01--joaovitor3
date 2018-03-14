@@ -23,10 +23,15 @@ int max(int a, int b) {
     return b;
 }
 
+int condicao_pixel_igual(Pixel p1, Pixel p2){
+  if (p1.r == p2.r &&
+      p1.g == p2.g &&
+      p1.b == p2.b)
+      return 1;
+}
+
 int pixel_igual(Pixel p1, Pixel p2) {
-    if (p1.r == p2.r &&
-        p1.g == p2.g &&
-        p1.b == p2.b)
+    if (condicao_pixel_igual(p1,p2))
         return 1;
     return 0;
 }

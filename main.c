@@ -22,10 +22,10 @@ typedef struct _image {
 } Image;
 
 
-int maior_inteiro(int numero_a, int numero_b) {
-    if (numero_a > numero_b)
-        return numero_a;
-    return numero_b;
+int maior_inteiro(int number_a, int number_b) {
+    if (number_a > number_b)
+        return number_a;
+    return number_b;
 }
 
 int verifica_pixel_igual(Pixel pixel_1, Pixel pixel_2) {
@@ -71,8 +71,8 @@ void blur(unsigned int height, unsigned short int pixel[WIDTH][HEIGHT][RGB], int
 
             int smaller_height = (height - 1 > i + transparency/2) ? i + transparency/2 : height - 1;
             int min_width = (width - 1 > j + transparency/2) ? j + transparency/2 : width - 1;
-            for(int x = (0 > i - transparency/2 ? 0 : i - transparency/2); x <= smaller_height; ++x) {
-                for(int y = (0 > j - transparency/2 ? 0 : j - transparency/2); y <= min_width; ++y) {
+            for(int x_axis = (0 > i - transparency/2 ? 0 : i - transparency/2); x_axis <= smaller_height; ++x_axis) {
+                for(int y_axis = (0 > j - transparency/2 ? 0 : j - transparency/2); y_axis <= min_width; ++y_axis) {
                     media.r += pixel[x_axis][y_axis][0];
                     media.g += pixel[x_axis][y_axis][1];
                     media.b += pixel[x_axis][y_axis][2];
@@ -188,7 +188,7 @@ int main() {
 
                         p =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
                         smaller_r = (255 >  p) ? p : 255;
-                        img.pixel[x][j][2] = smaller_r;
+                        img.pixel[x_axis][j][2] = smaller_r;
                     }
                 }
 
@@ -220,9 +220,9 @@ int main() {
 
                 for (int i2 = 0; i2 < height; ++i2) {
                     for (int j = 0; j < width; ++j) {
-                        int x_axis = i2, y = j;
+                        int x_axis = i2, y_axis = j;
 
-                        if (horizontal == 1) y = img.width - 1 - j;
+                        if (horizontal == 1) y_axis = img.width - 1 - j;
                         else x_axis = img.height - 1 - i2;
 
                         Pixel aux1;

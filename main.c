@@ -3,7 +3,6 @@
 #define HEIGHT 512
 #define RGB 3
 
-
 typedef struct _pixel {
     unsigned short int r;
     unsigned short int g;
@@ -152,7 +151,7 @@ Image cortar_imagem(Image img, int iterator_x, int iterator_y, int width, int he
 int set_pixel_size(int pixel){
   // (255 >  p) ? p : 255
   if(pixel < 255)
-  return pixel;
+    return pixel;
   return 255;
 }
 
@@ -183,6 +182,18 @@ Image sepia(Image img){
   return img;
 }
 
+Image read_image_pixels(Image img){
+  for (unsigned int i = 0; i < img.height; ++i) {
+      for (unsigned int j = 0; j < img.width; ++j) {
+          scanf("%hu %hu %hu", &img.pixel[i][j][0],
+                               &img.pixel[i][j][1],
+                               &img.pixel[i][j][2]);
+
+      }
+  }
+  return img;
+}
+
 int main() {
     Image img;
 
@@ -195,14 +206,7 @@ int main() {
     scanf("%u %u %d", &img.width, &img.height, &max_color);
 
     // read all pixels of image
-    for (unsigned int i = 0; i < img.height; ++i) {
-        for (unsigned int j = 0; j < img.width; ++j) {
-            scanf("%hu %hu %hu", &img.pixel[i][j][0],
-                                 &img.pixel[i][j][1],
-                                 &img.pixel[i][j][2]);
-
-        }
-    }
+    img = read_image_pixels(img);
 
     int n_opcoes;
     scanf("%d", &n_opcoes);

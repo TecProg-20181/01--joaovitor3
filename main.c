@@ -63,13 +63,27 @@ Image escala_de_cinza(Image img) {
     return img;
 }
 
+int condition_is_true(int condition){
+  if(condition)
+    return 1;
+  return 0;
+}
+
+int transform_ternary_operator_in_condition(int condition, int if_case, int else_case){
+  if(condition_is_true(condition))
+    return if_case;
+  return else_case;
+}
+
 void blur(unsigned int height, unsigned short int pixel[WIDTH][HEIGHT][RGB], int size, unsigned int width) {
     for (unsigned int i = 0; i < height; ++i) {
         for (unsigned int j = 0; j < width; ++j) {
             Pixel media = {0, 0, 0};
 
             int smaller_height = (height - 1 > i + size/2) ? i + size/2 : height - 1;
+            // int smaller_height = transform_ternary_operator_in_condition((height - 1 > i + size/2), i + size/2, height - 1);
             int min_width = (width - 1 > j + size/2) ? j + size/2 : width - 1;
+            // int min_width = transform_ternary_operator_in_condition(width - 1 > j + size/2, j + size/2, width - 1)
             for(int iterator_x = (0 > i - size/2 ? 0 : i - size/2); iterator_x <= smaller_height; ++iterator_x) {
                 for(int iterator_y = (0 > j - size/2 ? 0 : j - size/2); iterator_y <= min_width; ++iterator_y) {
                     media.r += pixel[iterator_x][iterator_y][0];
@@ -138,8 +152,35 @@ Image cortar_imagem(Image img, int iterator_x, int iterator_y, int width, int he
 int set_pixel_size(int pixel){
   // (255 >  p) ? p : 255
   if(pixel < 255)
-    return pixel;
+  return pixel;
   return 255;
+}
+
+Image sepia(Image img){
+  for (unsigned int i = 0; i < img.height; ++i) {
+      for (unsigned int j = 0; j < img.width; ++j) {
+          unsigned short int pixel[3];
+           pixel[0] = img.pixel[i][j][0];
+           pixel[1] = img.pixel[i][j][1];
+           pixel[2] = img.pixel[i][j][2];
+
+          int final_pixel =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
+          // int smaller_r = (255 >  p) ? p : 255;
+          int smaller_r = set_pixel_size(final_pixel);
+          img.pixel[i][j][0] = smaller_r;
+
+          final_pixel =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
+          // smaller_r = (255 >  p) ? p : 255;
+          smaller_r = set_pixel_size(final_pixel);
+          img.pixel[i][j][1] = smaller_r;
+
+          final_pixel =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
+          // smaller_r = (255 >  p) ? p : 255;
+          smaller_r = set_pixel_size(final_pixel);
+          img.pixel[i][j][2] = smaller_r;
+      }
+  }
+  return img;
 }
 
 int main() {
@@ -176,29 +217,7 @@ int main() {
                 break;
             }
             case 2: { // Filtro Sepia
-                for (unsigned int iterator_x = 0; iterator_x < img.height; ++iterator_x) {
-                    for (unsigned int j = 0; j < img.width; ++j) {
-                        unsigned short int pixel[3];
-                        pixel[0] = img.pixel[iterator_x][j][0];
-                        pixel[1] = img.pixel[iterator_x][j][1];
-                        pixel[2] = img.pixel[iterator_x][j][2];
-
-                        int final_pixel =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
-                        // int smaller_r = (255 >  p) ? p : 255;
-                        int smaller_r = set_pixel_size(final_pixel);
-                        img.pixel[iterator_x][j][0] = smaller_r;
-
-                        final_pixel =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
-                        // smaller_r = (255 >  p) ? p : 255;
-                        smaller_r = set_pixel_size(final_pixel);
-                        img.pixel[iterator_x][j][1] = smaller_r;
-
-                        final_pixel =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
-                        // smaller_r = (255 >  p) ? p : 255;
-                        smaller_r = set_pixel_size(final_pixel);
-                        img.pixel[iterator_x][j][2] = smaller_r;
-                    }
-                }
+                img = sepia(img);
                 break;
             }
             case 3: { // Blur

@@ -1,10 +1,6 @@
 #include <stdio.h>
 #define WIDTH 512
 #define HEIGHT 512
-#define RGB 3
-#define RED 0
-#define GREEN 1
-#define BLUE 2
 
 typedef struct _pixel {
     unsigned short int r;
@@ -13,11 +9,7 @@ typedef struct _pixel {
 } Pixel;
 
 typedef struct _image {
-    // [width][height][rgb]
-    // 0 -> r
-    // 1 -> g
-    // 2 -> b
-    unsigned short int pixel[WIDTH][HEIGHT][RGB];
+    Pixel pixel[WIDTH][HEIGHT];
     unsigned int width;
     unsigned int height;
 } Image;
@@ -45,13 +37,13 @@ int pixel_igual(Pixel pixel_1, Pixel pixel_2) {
 Image set_escala_cinza(Image img){
   for (unsigned int i = 0; i < img.height; ++i) {
       for (unsigned int j = 0; j < img.width; ++j) {
-          int media = img.pixel[i][j][RED] +
-                      img.pixel[i][j][GREEN] +
-                      img.pixel[i][j][BLUE];
+          int media = img.pixel[i][j].r +
+                      img.pixel[i][j].g +
+                      img.pixel[i][j].b;
           media /= 3;
-          img.pixel[i][j][RED] = media;
-          img.pixel[i][j][GREEN] = media;
-          img.pixel[i][j][BLUE] = media;
+          img.pixel[i][j].r = media;
+          img.pixel[i][j].g = media;
+          img.pixel[i][j].b = media;
       }
   }
   return img;
@@ -61,7 +53,6 @@ Image set_escala_cinza(Image img){
 Image escala_de_cinza(Image img) {
 
     img = set_escala_cinza(img);
-
     return img;
 }
 
@@ -71,29 +62,18 @@ int condicao_e_verdadeira(int condition){
   return 0;
 }
 
-int transform_ternary_operator_in_condition(int condition, int if_case, int else_case){
-  if(condicao_e_verdadeira(condition))
-    return if_case;
-  return else_case;
-}
-
-
-void blur(unsigned int height, unsigned short int pixel[WIDTH][HEIGHT][RGB], unsigned int width) {
-    int size = 0;
-    scanf("%d", &size);
-    for (unsigned int i = 0; i < height; ++i) {
-        for (unsigned int j = 0; j < width; ++j) {
+Image blur(Image img, int size) {
+    for (unsigned int i = 0; i < img.height; ++i) {
+        for (unsigned int j = 0; j < img.width; ++j) {
             Pixel media = {0, 0, 0};
 
-            int smaller_height = (height - 1 > i + size/2) ? i + size/2 : height - 1;
-            // int smaller_height = transform_ternary_operator_in_condition((height - 1 > i + size/2), i + size/2, height - 1);
-            int min_width = (width - 1 > j + size/2) ? j + size/2 : width - 1;
-            // int min_width = transform_ternary_operator_in_condition(width - 1 > j + size/2, j + size/2, width - 1)
+            int smaller_height = (img.height - 1 > i + size/2) ? i + size/2 : img.height - 1;
+            int min_width = (img.width - 1 > j + size/2) ? j + size/2 : img.width - 1;
             for(int iterator_x = (0 > i - size/2 ? 0 : i - size/2); iterator_x <= smaller_height; ++iterator_x) {
                 for(int iterator_y = (0 > j - size/2 ? 0 : j - size/2); iterator_y <= min_width; ++iterator_y) {
-                    media.r += pixel[iterator_x][iterator_y][RED];
-                    media.g += pixel[iterator_x][iterator_y][GREEN];
-                    media.b += pixel[iterator_x][iterator_y][BLUE];
+                    media.r += img.pixel[iterator_x][iterator_y].r;
+                    media.g += img.pixel[iterator_x][iterator_y].g;
+                    media.b += img.pixel[iterator_x][iterator_y].b;
                 }
             }
 
@@ -102,9 +82,38 @@ void blur(unsigned int height, unsigned short int pixel[WIDTH][HEIGHT][RGB], uns
             media.g /= size * size;
             media.b /= size * size;
 
-            pixel[i][j][RED] = media.r;
-            pixel[i][j][GREEN] = media.g;
-            pixel[i][j][BLUE] = media.b;
+            img.pixel[i][j].r = media.r;
+            img.pixel[i][j].g = media.g;
+            img.pixel[i][j].b = media.b;
+        }
+    }
+    return img;
+}
+
+
+void blur(unsigned int h, unsigned short int pixel[512][512][3], int T, unsigned int w) {
+    for (unsigned int i = 0; i < h; ++i) {
+        for (unsigned int j = 0; j < w; ++j) {
+            Pixel media = {0, 0, 0};
+
+            int menor_h = (h - 1 > i + T/2) ? i + T/2 : h - 1;
+            int min_w = (w - 1 > j + T/2) ? j + T/2 : w - 1;
+            for(int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_h; ++x) {
+                for(int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_w; ++y) {
+                    media.r += pixel[x][y][0];
+                    media.g += pixel[x][y][1];
+                    media.b += pixel[x][y][2];
+                }
+            }
+
+            // printf("%u", media.r)
+            media.r /= T * T;
+            media.g /= T * T;
+            media.b /= T * T;
+
+            pixel[i][j][0] = media.r;
+            pixel[i][j][1] = media.g;
+            pixel[i][j][2] = media.b;
         }
     }
 }
@@ -117,24 +126,24 @@ Image rotacionar90direita(Image img) {
 
     for (unsigned int i = 0, iterator_y = 0; i < rotacionada.height; ++i, ++iterator_y) {
         for (int j = rotacionada.width - 1, iterator_x = 0; j >= 0; --j, ++iterator_x) {
-            rotacionada.pixel[i][j][RED] = img.pixel[iterator_x][iterator_y][RED];
-            rotacionada.pixel[i][j][GREEN] = img.pixel[iterator_x][iterator_y][BLUE];
-            rotacionada.pixel[i][j][BLUE] = img.pixel[iterator_x][iterator_y][BLUE];
+            rotacionada.pixel[i][j].r = img.pixel[iterator_x][iterator_y].r;
+            rotacionada.pixel[i][j].g = img.pixel[iterator_x][iterator_y].b;
+            rotacionada.pixel[i][j].b = img.pixel[iterator_x][iterator_y].b;
         }
     }
 
     return rotacionada;
 }
 
-void inverter_cores(unsigned short int pixel[WIDTH][HEIGHT][RGB],
-                    unsigned int width, unsigned int height) {
-    for (unsigned int i = 0; i < height; ++i) {
-        for (unsigned int j = 0; j < width; ++j) {
-            pixel[i][j][RED] = 255 - pixel[i][j][RED];
-            pixel[i][j][GREEN] = 255 - pixel[i][j][GREEN];
-            pixel[i][j][BLUE] = 255 - pixel[i][j][BLUE];
+Image inverter_cores(Image img) {
+    for (unsigned int i = 0; i < img.height; ++i) {
+        for (unsigned int j = 0; j < img.width; ++j) {
+            img.pixel[i][j].r = 255 - img.pixel[i][j].r;
+            img.pixel[i][j].g = 255 - img.pixel[i][j].g;
+            img.pixel[i][j].b = 255 - img.pixel[i][j].b;
         }
     }
+  return img;
 }
 
 Image corta_imagem_parcialmente(Image img, int iterator_x, int iterator_y, int width, int height) {
@@ -145,9 +154,9 @@ Image corta_imagem_parcialmente(Image img, int iterator_x, int iterator_y, int w
 
     for(int i = 0; i < height; ++i) {
         for(int j = 0; j < width; ++j) {
-            cortada.pixel[i][j][RED] = img.pixel[i + iterator_y][j + iterator_x][RED];
-            cortada.pixel[i][j][GREEN] = img.pixel[i + iterator_y][j + iterator_x][GREEN];
-            cortada.pixel[i][j][BLUE] = img.pixel[i + iterator_y][j + iterator_x][BLUE];
+            cortada.pixel[i][j].r = img.pixel[i + iterator_y][j + iterator_x].r;
+            cortada.pixel[i][j].g = img.pixel[i + iterator_y][j + iterator_x].g;
+            cortada.pixel[i][j].b = img.pixel[i + iterator_y][j + iterator_x].b;
         }
     }
 
@@ -164,21 +173,21 @@ Image sepia(Image img){
   for (unsigned int i = 0; i < img.height; ++i) {
       for (unsigned int j = 0; j < img.width; ++j) {
           unsigned short int pixel[3];
-           pixel[RED] = img.pixel[i][j][RED];
-           pixel[GREEN] = img.pixel[i][j][GREEN];
-           pixel[BLUE] = img.pixel[i][j][BLUE];
+           pixel[RED] = img.pixel[i][j].r;
+           pixel[GREEN] = img.pixel[i][j].g;
+           pixel[BLUE] = img.pixel[i][j].b;
 
           int final_pixel =  pixel[RED] * .393 + pixel[GREEN] * .769 + pixel[BLUE] * .189;
           int smaller_r = set_pixel_size(final_pixel);
-          img.pixel[i][j][RED] = smaller_r;
+          img.pixel[i][j].r = smaller_r;
 
           final_pixel =  pixel[RED] * .349 + pixel[GREEN] * .686 + pixel[BLUE] * .168;
           smaller_r = set_pixel_size(final_pixel);
-          img.pixel[i][j][GREEN] = smaller_r;
+          img.pixel[i][j].g = smaller_r;
 
           final_pixel =  pixel[RED] * .272 + pixel[GREEN] * .534 + pixel[BLUE] * .131;
           smaller_r = set_pixel_size(final_pixel);
-          img.pixel[i][j][BLUE] = smaller_r;
+          img.pixel[i][j].b = smaller_r;
       }
   }
   return img;
@@ -187,9 +196,9 @@ Image sepia(Image img){
 Image read_image_pixels(Image img){
   for (unsigned int i = 0; i < img.height; ++i) {
       for (unsigned int j = 0; j < img.width; ++j) {
-          scanf("%hu %hu %hu", &img.pixel[i][j][RED],
-                               &img.pixel[i][j][GREEN],
-                               &img.pixel[i][j][BLUE]);
+          scanf("%hu %hu %hu", &img.pixel[i][j].r,
+                               &img.pixel[i][j].g,
+                               &img.pixel[i][j].b);
 
       }
   }
@@ -210,7 +219,8 @@ Image espelhamento(Image img){
   int horizontal = 0;
   scanf("%d", &horizontal);
 
-  int width = img.width, height = img.height;
+  int width = img.width;
+  int height = img.height;
 
   if (horizontal == 1) width /= 2;
   else height /= 2;
@@ -223,17 +233,17 @@ Image espelhamento(Image img){
           else iterator_x = img.height - 1 - i2;
 
           Pixel aux1;
-          aux1.r = img.pixel[i2][j][RED];
-          aux1.g = img.pixel[i2][j][GREEN];
-          aux1.b = img.pixel[i2][j][BLUE];
+          aux1.r = img.pixel[i2][j].r;
+          aux1.g = img.pixel[i2][j].g;
+          aux1.b = img.pixel[i2][j].b;
 
-          img.pixel[i2][j][RED] = img.pixel[iterator_x][iterator_y][RED];
-          img.pixel[i2][j][GREEN] = img.pixel[iterator_x][iterator_y][GREEN];
-          img.pixel[i2][j][BLUE] = img.pixel[iterator_x][iterator_y][BLUE];
+          img.pixel[i2][j].r = img.pixel[iterator_x][iterator_y].r;
+          img.pixel[i2][j].g = img.pixel[iterator_x][iterator_y].g;
+          img.pixel[i2][j].b = img.pixel[iterator_x][iterator_y].b;
 
-          img.pixel[iterator_x][iterator_y][RED] = aux1.r;
-          img.pixel[iterator_x][iterator_y][GREEN] = aux1.g;
-          img.pixel[iterator_x][iterator_y][BLUE] = aux1.b;
+          img.pixel[iterator_x][iterator_y].r = aux1.r;
+          img.pixel[iterator_x][iterator_y].g = aux1.g;
+          img.pixel[iterator_x][iterator_y].b = aux1.b;
       }
   }
   return img;
@@ -252,45 +262,12 @@ Image rotaciona(Image img){
 void print_pixels(Image img){
   for (unsigned int i = 0; i < img.height; ++i) {
       for (unsigned int j = 0; j < img.width; ++j) {
-          printf("%hu %hu %hu ", img.pixel[i][j][RED],
-                                 img.pixel[i][j][GREEN],
-                                 img.pixel[i][j][BLUE]);
+          printf("%hu %hu %hu ", img.pixel[i][j].r,
+                                 img.pixel[i][j].g,
+                                 img.pixel[i][j].b);
 
       }
       printf("\n");
-  }
-}
-
-void menu(int opcao, Image img){
-  switch(opcao) {
-    case 1: { // Escala de Cinza
-      img = escala_de_cinza(img);
-      break;
-    }
-    case 2: { // Filtro Sepia
-      img = sepia(img);
-      break;
-    }
-    case 3: { // Blur
-      blur(img.height, img.pixel, img.width);
-      break;
-    }
-    case 4: { // Rotacao
-      img = rotaciona(img);
-      break;
-    }
-    case 5: { // Espelhamento
-      img = espelhamento(img);
-      break;
-    }
-    case 6: { // Inversao de Cores
-      inverter_cores(img.pixel, img.width, img.height);
-      break;
-    }
-    case 7: { // Cortar Imagem
-      img = corta_imagem_totalmente(img);
-      break;
-    }
   }
 }
 
@@ -314,6 +291,8 @@ int main() {
     for(int i = 0; i < n_opcoes; ++i) {
         int opcao;
         scanf("%d", &opcao);
+        // img = menu(opcao, img);
+
         switch(opcao) {
             case 1: { // Escala de Cinza
                 img = escala_de_cinza(img);
@@ -324,7 +303,9 @@ int main() {
                 break;
             }
             case 3: { // Blur
-                blur(img.height, img.pixel, img.width);
+                int size = 0;
+                scanf("%d", &size);
+                img = blur(img, size);
                 break;
             }
             case 4: { // Rotacao
@@ -336,7 +317,7 @@ int main() {
                 break;
             }
             case 6: { // Inversao de Cores
-                inverter_cores(img.pixel, img.width, img.height);
+                img = inverter_cores(img);
                 break;
             }
             case 7: { // Cortar Imagem

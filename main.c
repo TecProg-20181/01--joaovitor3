@@ -34,19 +34,6 @@ int min_numero(int numero_a, int numero_b) {
     return numero_b;
 }
 
-int verifica_pixel_igual(Pixel pixel_1, Pixel pixel_2) {
-  if (pixel_1.r == pixel_2.r &&
-      pixel_1.g == pixel_2.g &&
-      pixel_1.b == pixel_2.b)
-      return 1;
-}
-
-int pixel_igual(Pixel pixel_1, Pixel pixel_2) {
-    if (verifica_pixel_igual(pixel_1, pixel_2))
-        return 1;
-    return 0;
-}
-
 Image escala_de_cinza(Image img) {
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {

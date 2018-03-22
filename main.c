@@ -91,32 +91,32 @@ Image blur(Image img, int size) {
 }
 
 
-void blur(unsigned int h, unsigned short int pixel[512][512][3], int T, unsigned int w) {
-    for (unsigned int i = 0; i < h; ++i) {
-        for (unsigned int j = 0; j < w; ++j) {
-            Pixel media = {0, 0, 0};
-
-            int menor_h = (h - 1 > i + T/2) ? i + T/2 : h - 1;
-            int min_w = (w - 1 > j + T/2) ? j + T/2 : w - 1;
-            for(int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_h; ++x) {
-                for(int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_w; ++y) {
-                    media.r += pixel[x][y][0];
-                    media.g += pixel[x][y][1];
-                    media.b += pixel[x][y][2];
-                }
-            }
-
-            // printf("%u", media.r)
-            media.r /= T * T;
-            media.g /= T * T;
-            media.b /= T * T;
-
-            pixel[i][j][0] = media.r;
-            pixel[i][j][1] = media.g;
-            pixel[i][j][2] = media.b;
-        }
-    }
-}
+// void blur(unsigned int h, unsigned short int pixel[512][512][3], int T, unsigned int w) {
+//     for (unsigned int i = 0; i < h; ++i) {
+//         for (unsigned int j = 0; j < w; ++j) {
+//             Pixel media = {0, 0, 0};
+//
+//             int menor_h = (h - 1 > i + T/2) ? i + T/2 : h - 1;
+//             int min_w = (w - 1 > j + T/2) ? j + T/2 : w - 1;
+//             for(int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_h; ++x) {
+//                 for(int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_w; ++y) {
+//                     media.r += pixel[x][y][0];
+//                     media.g += pixel[x][y][1];
+//                     media.b += pixel[x][y][2];
+//                 }
+//             }
+//
+//             // printf("%u", media.r)
+//             media.r /= T * T;
+//             media.g /= T * T;
+//             media.b /= T * T;
+//
+//             pixel[i][j][0] = media.r;
+//             pixel[i][j][1] = media.g;
+//             pixel[i][j][2] = media.b;
+//         }
+//     }
+// }
 
 Image rotacionar90direita(Image img) {
     Image rotacionada;
@@ -173,19 +173,19 @@ Image sepia(Image img){
   for (unsigned int i = 0; i < img.height; ++i) {
       for (unsigned int j = 0; j < img.width; ++j) {
           unsigned short int pixel[3];
-           pixel[RED] = img.pixel[i][j].r;
-           pixel[GREEN] = img.pixel[i][j].g;
-           pixel[BLUE] = img.pixel[i][j].b;
+           pixel[0] = img.pixel[i][j].r;
+           pixel[1] = img.pixel[i][j].g;
+           pixel[2] = img.pixel[i][j].b;
 
-          int final_pixel =  pixel[RED] * .393 + pixel[GREEN] * .769 + pixel[BLUE] * .189;
+          int final_pixel =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
           int smaller_r = set_pixel_size(final_pixel);
           img.pixel[i][j].r = smaller_r;
 
-          final_pixel =  pixel[RED] * .349 + pixel[GREEN] * .686 + pixel[BLUE] * .168;
+          final_pixel =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
           smaller_r = set_pixel_size(final_pixel);
           img.pixel[i][j].g = smaller_r;
 
-          final_pixel =  pixel[RED] * .272 + pixel[GREEN] * .534 + pixel[BLUE] * .131;
+          final_pixel =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
           smaller_r = set_pixel_size(final_pixel);
           img.pixel[i][j].b = smaller_r;
       }

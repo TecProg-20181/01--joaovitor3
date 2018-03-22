@@ -1,4 +1,6 @@
 #include <stdio.h>
+#define WIDTH 512
+#define HEIGHT 512
 
 #define WIDTH 512
 #define HEIGHT 512
@@ -32,10 +34,15 @@ int min_numero(int numero_a, int numero_b) {
     return numero_b;
 }
 
-int pixel_igual(Pixel p1, Pixel p2) {
-    if (p1.r == p2.r &&
-        p1.g == p2.g &&
-        p1.b == p2.b)
+int verifica_pixel_igual(Pixel pixel_1, Pixel pixel_2) {
+  if (pixel_1.r == pixel_2.r &&
+      pixel_1.g == pixel_2.g &&
+      pixel_1.b == pixel_2.b)
+      return 1;
+}
+
+int pixel_igual(Pixel pixel_1, Pixel pixel_2) {
+    if (verifica_pixel_igual(pixel_1, pixel_2))
         return 1;
     return 0;
 }
@@ -56,42 +63,42 @@ Image escala_de_cinza(Image img) {
     return img;
 }
 
+
 Image blur(Image img) {
     int tamanho = 0;
     scanf("%d", &tamanho);
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
-            Pixel media = {0, 0, 0};
+          Pixel media = {0, 0, 0};
 
-            //declara variáveis para realização de comparação com funções max e min
-            int numero_a_menor_height = img.height - 1;
-            int numero_b_menor_height = i + tamanho/2;
-            int numero_a_min_width = img.width - 1;
-            int numero_b_min_width = j + tamanho/2;
-            int numero_a_iterator_x = 0;
-            int numero_b_iterator_x = i - tamanho/2;
-            int numero_a_iterator_y = 0;
-            int numero_b_iterator_y = j - tamanho/2;
+          //declara variáveis para realização de comparação com funções max e min
+          int numero_a_menor_height = img.height - 1;
+          int numero_b_menor_height = i + tamanho/2;
+          int numero_a_min_width = img.width - 1;
+          int numero_b_min_width = j + tamanho/2;
+          int numero_a_iterator_x = 0;
+          int numero_b_iterator_x = i - tamanho/2;
+          int numero_a_iterator_y = 0;
+          int numero_b_iterator_y = j - tamanho/2;
 
 
-            int menor_height = min_numero(numero_a_menor_height, numero_b_menor_height);
-            int min_width = min_numero(numero_a_min_width, numero_b_min_width);
-            for(int iterator_x = max_numero(numero_a_iterator_x, numero_b_iterator_x); iterator_x <= menor_height; ++iterator_x) {
-                for(int iterator_y = max_numero(numero_a_iterator_y, numero_b_iterator_y); iterator_y <= min_width; ++iterator_y) {
-                    media.r += img.pixel[iterator_x][iterator_y].r;
-                    media.g += img.pixel[iterator_x][iterator_y].g;
-                    media.b += img.pixel[iterator_x][iterator_y].b;
-                }
-            }
+          int menor_height = min_numero(numero_a_menor_height, numero_b_menor_height);
+          int min_width = min_numero(numero_a_min_width, numero_b_min_width);
+          for(int iterator_x = max_numero(numero_a_iterator_x, numero_b_iterator_x); iterator_x <= menor_height; ++iterator_x) {
+              for(int iterator_y = max_numero(numero_a_iterator_y, numero_b_iterator_y); iterator_y <= min_width; ++iterator_y) {
+                  media.r += img.pixel[iterator_x][iterator_y].r;
+                  media.g += img.pixel[iterator_x][iterator_y].g;
+                  media.b += img.pixel[iterator_x][iterator_y].b;
+              }
+          }
 
-            // printf("%u", media.r)
-            media.r /= tamanho * tamanho;
-            media.g /= tamanho * tamanho;
-            media.b /= tamanho * tamanho;
+          media.r /= tamanho * tamanho;
+          media.g /= tamanho * tamanho;
+          media.b /= tamanho * tamanho;
 
-            img.pixel[i][j].r = media.r;
-            img.pixel[i][j].g = media.g;
-            img.pixel[i][j].b = media.b;
+          img.pixel[i][j].r = media.r;
+          img.pixel[i][j].g = media.g;
+          img.pixel[i][j].b = media.b;
         }
     }
     return img;
@@ -145,6 +152,7 @@ Image cortar_imagem(Image img) {
 
     return cortada;
 }
+
 
 Image sepia(Image img){
   for (unsigned int iterator_x = 0; iterator_x < img.height; ++iterator_x) {
@@ -289,7 +297,6 @@ int main() {
                 break;
             }
         }
-
     }
 
     // print type of image

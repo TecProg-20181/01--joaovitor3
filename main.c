@@ -2,9 +2,6 @@
 #define WIDTH 512
 #define HEIGHT 512
 
-#define WIDTH 512
-#define HEIGHT 512
-
 typedef struct _pixel {
     unsigned short int r;
     unsigned short int g;

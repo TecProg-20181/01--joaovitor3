@@ -71,10 +71,7 @@ Image blur(Image img) {
               }
           }
 
-          media = set_media_pixel_blur(media, tamanho);
-          // media.r /= tamanho * tamanho;
-          // media.g /= tamanho * tamanho;
-          // media.b /= tamanho * tamanho;
+          media = set_media_pixel_blur(media, tamanho);          
 
           img.pixel[i][j].r = media.r;
           img.pixel[i][j].g = media.g;

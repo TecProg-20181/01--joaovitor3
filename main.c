@@ -47,6 +47,12 @@ Image escala_de_cinza(Image img) {
     return img;
 }
 
+Pixel set_media_pixel_blur(Pixel media, int tamanho){
+  media.r /= tamanho * tamanho;
+  media.g /= tamanho * tamanho;
+  media.b /= tamanho * tamanho;
+  return media;
+}
 
 Image blur(Image img) {
     int tamanho = 0;
@@ -55,30 +61,20 @@ Image blur(Image img) {
         for (unsigned int j = 0; j < img.width; ++j) {
           Pixel media = {0, 0, 0};
 
-          //declara variáveis para realização de comparação com funções max e min
-          int numero_a_menor_height = img.height - 1;
-          int numero_b_menor_height = i + tamanho/2;
-          int numero_a_min_width = img.width - 1;
-          int numero_b_min_width = j + tamanho/2;
-          int numero_a_iterator_x = 0;
-          int numero_b_iterator_x = i - tamanho/2;
-          int numero_a_iterator_y = 0;
-          int numero_b_iterator_y = j - tamanho/2;
-
-
-          int menor_height = min_numero(numero_a_menor_height, numero_b_menor_height);
-          int min_width = min_numero(numero_a_min_width, numero_b_min_width);
-          for(int iterator_x = max_numero(numero_a_iterator_x, numero_b_iterator_x); iterator_x <= menor_height; ++iterator_x) {
-              for(int iterator_y = max_numero(numero_a_iterator_y, numero_b_iterator_y); iterator_y <= min_width; ++iterator_y) {
+          int menor_height = min_numero(img.height - 1, i+ tamanho/2);
+          int min_width = min_numero(img.width - 1, j + tamanho/2);
+          for(int iterator_x = max_numero(0, i - tamanho/2); iterator_x <= menor_height; ++iterator_x) {
+              for(int iterator_y = max_numero(0, j - tamanho/2); iterator_y <= min_width; ++iterator_y) {
                   media.r += img.pixel[iterator_x][iterator_y].r;
                   media.g += img.pixel[iterator_x][iterator_y].g;
                   media.b += img.pixel[iterator_x][iterator_y].b;
               }
           }
 
-          media.r /= tamanho * tamanho;
-          media.g /= tamanho * tamanho;
-          media.b /= tamanho * tamanho;
+          media = set_media_pixel_blur(media, tamanho);
+          // media.r /= tamanho * tamanho;
+          // media.g /= tamanho * tamanho;
+          // media.b /= tamanho * tamanho;
 
           img.pixel[i][j].r = media.r;
           img.pixel[i][j].g = media.g;
